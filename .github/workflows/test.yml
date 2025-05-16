@@ -39,3 +39,41 @@ jobs:
     - name: Run model tests
       run: |
         pytest day5/演習3/tests/test_model.py -v
+
+    - name: Run training script and capture accuracy
+      id: train_and_capture_accuracy # このステップの出力を他のステップで参照するためのID
+      working-directory: ./day5/演習3 # main.py があるディレクトリをワーキングディレクトリに設定
+      run: |
+        set -e # いずれかのコマンドがエラーになったら、すぐにスクリプトを終了する
+
+        echo "Running main.py to train model and get accuracy..."
+        script_output=$(python main.py)
+        
+        echo "Script output:"
+        echo "$script_output"
+        
+        accuracy_value=$(echo "$script_output" | grep -oP 'accuracy: \K[0-9\.]+')
+        
+        if [ -z "$accuracy_value" ]; then
+          echo "Error: Could not extract accuracy from script output."
+          echo "Please ensure 'main.py' prints accuracy in the format 'accuracy: <value>'"
+          exit 1
+        fi
+        
+        echo "Extracted accuracy: $accuracy_value"
+        # GitHub Actionsのステップ間で値を渡すために $GITHUB_OUTPUT に書き込む
+        echo "accuracy=$accuracy_value" >> $GITHUB_OUTPUT
+
+    - name: Check model accuracy threshold
+      run: |
+        # 前のステップから accuracy の値を取得
+        accuracy_value="${{ steps.train_and_capture_accuracy.outputs.accuracy }}"
+        
+        echo "Model accuracy from script is: $accuracy_value"
+        
+        if (( $(echo "$accuracy_value < 0.7" | bc -l) )); then
+          echo "Error: Model accuracy ($accuracy_value) is below the threshold of 0.7"
+          exit 1
+        else
+          echo "Model accuracy ($accuracy_value) meets the threshold (>= 0.7)"
+        fi
