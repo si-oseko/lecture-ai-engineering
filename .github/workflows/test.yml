@@ -42,7 +42,7 @@ jobs:
 
     - name: Run training script and capture accuracy
       id: train_and_capture_accuracy # このステップの出力を他のステップで参照するためのID
-      working-directory: ./day5/演習3 # main.py があるディレクトリをワーキングディレクトリに設定
+      working-directory: ./day5/演習1 # main.py があるディレクトリをワーキングディレクトリに設定
       run: |
         set -e # いずれかのコマンドがエラーになったら、すぐにスクリプトを終了する
 
