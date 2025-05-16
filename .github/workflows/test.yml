@@ -45,6 +45,7 @@ jobs:
       working-directory: ./day5/演習1 # main.py があるディレクトリをワーキングディレクトリに設定
       run: |
         set -e # いずれかのコマンドがエラーになったら、すぐにスクリプトを終了する
+        pip install -r ../requirements.txt # 依存関係をインストール
 
         echo "Running main.py to train model and get accuracy..."
         script_output=$(python main.py)
